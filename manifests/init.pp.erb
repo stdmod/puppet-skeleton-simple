@@ -1,0 +1,174 @@
+#
+# = Class: <%= metadata.name %>
+#
+# This class installs and manages <%= metadata.name %>
+#
+#
+# == Parameters
+#
+# Refer to https://github.com/stdmod for official documentation
+# on the stdmod parameters used
+#
+class <%= metadata.name %> (
+
+  $ensure                    = 'present',
+  $version                   = undef,
+
+  $package_name              = $<%= metadata.name %>::params::package_name,
+
+  $service_name              = $<%= metadata.name %>::params::service_name,
+  $service_ensure            = 'running',
+  $service_enable            = true,
+
+  $config_file_path          = $<%= metadata.name %>::params::config_file_path,
+  $config_file_replace       = $<%= metadata.name %>::params::config_file_replace,
+  $config_file_require       = 'Package[<%= metadata.name %>]',
+  $config_file_notify        = 'Service[<%= metadata.name %>]',
+  $config_file_source        = undef,
+  $config_file_template      = undef,
+  $config_file_content       = undef,
+  $config_file_options_hash  = undef,
+
+  $config_dir_path           = $<%= metadata.name %>::params::config_dir_path,
+  $config_dir_source         = undef,
+  $config_dir_purge          = false,
+  $config_dir_recurse        = true,
+
+  $dependency_class          = undef,
+  $my_class                  = undef,
+
+  $monitor_class             = undef,
+  $monitor_options_hash      = { } ,
+
+  $firewall_class            = undef,
+  $firewall_options_hash     = { } ,
+
+  $scope_hash_filter         = '(uptime.*|timestamp)',
+
+  $tcp_port                  = undef,
+  $udp_port                  = undef,
+
+  ) inherits <%= metadata.name %>::params {
+
+
+  # Input parameters validation
+
+  validate_re($ensure, ['present','absent'], 'Valid values: present, absent.')
+  validate_bool($service_enable)
+  validate_bool($config_dir_recurse)
+  validate_bool($config_dir_purge)
+  if $config_file_options_hash { validate_hash($config_file_options_hash) }
+  if $monitor_options_hash { validate_hash($monitor_options_hash) }
+  if $firewall_options_hash { validate_hash($firewall_options_hash) }
+
+
+  # Calculation of variables used in the module
+
+  $config_file_owner          = $<%= metadata.name %>::params::config_file_owner
+  $config_file_group          = $<%= metadata.name %>::params::config_file_group
+  $config_file_mode           = $<%= metadata.name %>::params::config_file_mode
+
+  if $config_file_content {
+    $manage_config_file_content = $config_file_content
+  } else {
+    if $config_file_template {
+      $manage_config_file_content = template($config_file_template)
+    } else {
+      $manage_config_file_content = undef
+    }
+  }
+
+  if $config_file_notify {
+    $manage_config_file_notify = $config_file_notify
+  } else {
+    $manage_config_file_notify = undef
+  }
+
+  if $version {
+    $manage_package_ensure = $version
+  } else {
+    $manage_package_ensure = $ensure
+  }
+
+  if $ensure == 'absent' {
+    $manage_service_enable = undef
+    $manage_service_ensure = stopped
+    $config_dir_ensure = absent
+    $config_file_ensure = absent
+  } else {
+    $manage_service_enable = $service_enable
+    $manage_service_ensure = $service_ensure
+    $config_dir_ensure = directory
+    $config_file_ensure = present
+  }
+
+
+  # Resources manage
+
+  if $<%= metadata.name %>::package_name {
+    package { $<%= metadata.name %>::package_name:
+      ensure   => $<%= metadata.name %>::manage_package_ensure,
+    }
+  }
+
+  if $<%= metadata.name %>::service_name {
+    service { $<%= metadata.name %>::service_name:
+      ensure     => $<%= metadata.name %>::manage_service_ensure,
+      enable     => $<%= metadata.name %>::manage_service_enable,
+    }
+  }
+
+  if $<%= metadata.name %>::config_file_path {
+    file { '<%= metadata.name %>.conf':
+      ensure  => $<%= metadata.name %>::config_file_ensure,
+      path    => $<%= metadata.name %>::config_file_path,
+      mode    => $<%= metadata.name %>::config_file_mode,
+      owner   => $<%= metadata.name %>::config_file_owner,
+      group   => $<%= metadata.name %>::config_file_group,
+      source  => $<%= metadata.name %>::config_file_source,
+      content => $<%= metadata.name %>::manage_config_file_content,
+      notify  => $<%= metadata.name %>::manage_config_file_notify,
+      require => $<%= metadata.name %>::config_file_require,
+    }
+  }
+
+  if $<%= metadata.name %>::config_dir_source {
+    file { '<%= metadata.name %>.dir':
+      ensure  => $<%= metadata.name %>::config_dir_ensure,
+      path    => $<%= metadata.name %>::config_dir_path,
+      source  => $<%= metadata.name %>::config_dir_source,
+      recurse => $<%= metadata.name %>::config_dir_recurse,
+      purge   => $<%= metadata.name %>::config_dir_purge,
+      force   => $<%= metadata.name %>::config_dir_purge,
+      notify  => $<%= metadata.name %>::config_file_notify,
+      require => $<%= metadata.name %>::config_file_require,
+    }
+  }
+
+
+  # Extra classes
+
+  if $<%= metadata.name %>::dependency_class {
+    include $<%= metadata.name %>::dependency_class
+  }
+
+  if $<%= metadata.name %>::my_class {
+    include $<%= metadata.name %>::my_class
+  }
+
+  if $<%= metadata.name %>::monitor_class {
+    class { $<%= metadata.name %>::monitor_class:
+      options_hash => $<%= metadata.name %>::monitor_options_hash,
+      scope_hash   => {}, # TODO: Find a good way to inject class' scope
+    }
+  }
+
+  if $<%= metadata.name %>::firewall_class {
+    class { $<%= metadata.name %>::firewall_class:
+      options_hash => $<%= metadata.name %>::firewall_options_hash,
+      scope_hash   => {},
+    }
+  }
+
+}
+
