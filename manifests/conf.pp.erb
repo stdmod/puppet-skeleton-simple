@@ -102,11 +102,6 @@ define <%= metadata.name %>::conf (
     default => $require,
   }
 
-  $manage_notify = $notify ? {
-    undef   => $<%= metadata.name %>::manage_config_file_notify,
-    default => $notify,
-  }
-
   $manage_replace = $replace ? {
     undef   => $<%= metadata.name %>::config_file_replace,
     default => $replace,
@@ -121,7 +116,7 @@ define <%= metadata.name %>::conf (
     owner   => $manage_owner,
     group   => $manage_group,
     require => $manage_require,
-    notify  => $manage_notify,
+    notify  => $notify,
     replace => $manage_replace,
   }
 
