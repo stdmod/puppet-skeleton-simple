@@ -8,10 +8,6 @@ class <%= metadata.name %>::params {
     default => '<%= metadata.name %>',
   }
 
-  $service_name = $::osfamily ? {
-    default => '<%= metadata.name %>',
-  }
-
   $config_file_path = $::osfamily ? {
     default => '/etc/<%= metadata.name %>/<%= metadata.name %>.conf',
   }
@@ -35,7 +31,7 @@ class <%= metadata.name %>::params {
   case $::osfamily {
     'Debian','RedHat','Amazon': { }
     default: {
-      fail("${::operatingsystem} not supported")
+      fail("${::operatingsystem} not supported. Review params.pp for extending support.")
     }
   }
 }
