@@ -20,9 +20,11 @@ meant to be better templates for use with the puppet module tool.
 
 As we don't want to have our .git files and this README in our skeleton, we export it like this:
 
-    git clone https://github.com/stdmod/puppet-module-skeleton
-    cd puppet-module-skeleton
-    rsync -av --delete --exclude '.git' .  $HOME/.puppet/var/puppet-module/
+    git clone https://github.com/stdmod/puppet-skeleton-simple
+    cd puppet-skeleton-simple
+
+    mkdir -p $HOME/.puppet/var/puppet-module/skeleton
+    rsync -av --delete --exclude '.git' .  $HOME/.puppet/var/puppet-module/skeleton
 
 ## Usage
 
