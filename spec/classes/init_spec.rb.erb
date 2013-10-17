@@ -10,6 +10,7 @@ describe '<%= metadata.name %>' do
           :osfamily => osfamily,
         }}
         it { should contain_package('<%= metadata.name %>').with_ensure('present') }
+        it { should contain_service('<%= metadata.name %>').with_ensure('running') }
       end
 
       describe "#{osfamily} Installation of a specific package version" do
@@ -30,7 +31,21 @@ describe '<%= metadata.name %>' do
           :osfamily => osfamily,
         }}
         it 'should remove Package[<%= metadata.name %>]' do should contain_package('<%= metadata.name %>').with_ensure('absent') end
+        it 'should stop Service[<%= metadata.name %>]' do should contain_service('<%= metadata.name %>').with_ensure('stopped') end
+        it 'should not manage at boot Service[<%= metadata.name %>]' do should contain_service('<%= metadata.name %>').with_enable(nil) end
         it 'should remove <%= metadata.name %> configuration file' do should contain_file('<%= metadata.name %>.conf').with_ensure('absent') end
+      end
+
+      describe "#{osfamily} Service disabling" do
+        let(:params) { {
+          :service_ensure => 'stopped',
+          :service_enable => false,
+        } }
+        let(:facts) {{
+          :osfamily => osfamily,
+        }}
+        it 'should stop Service[<%= metadata.name %>]' do should contain_service('<%= metadata.name %>').with_ensure('stopped') end
+        it 'should not enable at boot Service[<%= metadata.name %>]' do should contain_service('<%= metadata.name %>').with_enable('false') end
       end
 
       describe "#{osfamily} Configuration via custom template" do
@@ -68,6 +83,27 @@ describe '<%= metadata.name %>' do
         it { should contain_file('<%= metadata.name %>.dir').with_source('puppet:///modules/<%= metadata.name %>/tests/') }
         it { should contain_file('<%= metadata.name %>.dir').with_purge('true') }
         it { should contain_file('<%= metadata.name %>.dir').with_force('true') }
+      end
+
+      describe "#{osfamily} Service restart on config file change (default)" do
+        let(:facts) {{
+          :osfamily => osfamily,
+        }}
+        it 'should automatically restart the service when files change' do
+          should contain_file('<%= metadata.name %>.conf').with_notify('Service[<%= metadata.name %>]')
+        end
+      end
+
+      describe "#{osfamily} Service restart disabling on config file change" do
+        let(:params) { {
+          :config_file_notify => '',
+        } }
+        let(:facts) {{
+          :osfamily => osfamily,
+        }}
+        it 'should automatically restart the service when files change' do
+          should contain_file('<%= metadata.name %>.conf').without_notify
+        end
       end
 
     end
