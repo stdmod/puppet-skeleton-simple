@@ -32,7 +32,7 @@ RSpec.configure do |c|
     puppet_install
 
     # Copy this module into the module path of the test node
-    puppet_module_install(:source => proj_root, :module_name => 'redis')
+    puppet_module_install(:source => proj_root, :module_name => '<%= metadata.name %>')
     shell('puppet module install puppetlabs/stdlib')
 
     file = Tempfile.new('foo')
