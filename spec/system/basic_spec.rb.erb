@@ -1,23 +1,13 @@
 require 'spec_helper_system'
 
-describe 'install:' do
-  after :all do
-    # Cleanup after tests have ran
-    puppet_apply("class { '<%= metadata.name %>': ensure => absent }") do |r|
-      r.exit_code.should_not == 1
-    end
-  end
-
-  it 'test <%= metadata.name %>' do
-    pp = fixture_read('modules/<%= metadata.name %>/tests/init.pp')
+describe 'basic tests' do
+  it 'class should work without errors' do
+    pp = <<-EOS
+      class { '<%= metadata.name %>': }
+    EOS
 
     puppet_apply(pp) do |r|
-      r.exit_code.should_not == 1
-    end
-
-    puppet_apply(pp) do |r|
-      r.exit_code.should be_zero
+      r.exit_code.should == 2
     end
   end
-
 end

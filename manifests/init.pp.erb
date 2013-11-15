@@ -11,18 +11,16 @@
 #
 class <%= metadata.name %> (
 
-  $ensure                    = 'present',
-  $version                   = undef,
-
   $package_name              = $<%= metadata.name %>::params::package_name,
+  $package_ensure            = 'present',
 
   $config_file_path          = $<%= metadata.name %>::params::config_file_path,
-  $config_file_replace       = $<%= metadata.name %>::params::config_file_replace,
   $config_file_require       = 'Package[<%= metadata.name %>]',
+  $config_file_replace       = undef,
   $config_file_source        = undef,
   $config_file_template      = undef,
   $config_file_content       = undef,
-  $config_file_options_hash  = undef,
+  $config_file_options_hash  = { } ,
 
   $config_dir_path           = $<%= metadata.name %>::params::config_dir_path,
   $config_dir_source         = undef,
@@ -30,14 +28,13 @@ class <%= metadata.name %> (
   $config_dir_recurse        = true,
 
   $dependency_class          = undef,
-
-  $scope_hash_filter         = '(uptime.*|timestamp)',
+  $my_class                  = undef,
 
   ) inherits <%= metadata.name %>::params {
 
 
-  # Input parameters validation
-  validate_re($ensure, ['present','absent'], 'Valid values: present, absent.')
+  # Class variables validation and management
+
   validate_bool($config_dir_recurse)
   validate_bool($config_dir_purge)
   if $config_file_options_hash { validate_hash($config_file_options_hash) }
@@ -46,29 +43,9 @@ class <%= metadata.name %> (
   $config_file_group          = $<%= metadata.name %>::params::config_file_group
   $config_file_mode           = $<%= metadata.name %>::params::config_file_mode
 
-  if $config_file_content {
-    $manage_config_file_content = $config_file_content
-  } else {
-    if $config_file_template {
-      $manage_config_file_content = template($config_file_template)
-    } else {
-      $manage_config_file_content = undef
-    }
-  }
+  $manage_config_file_content = default_content($config_file_content, $config_file_template)
 
-  if $config_file_notify {
-    $manage_config_file_notify = $config_file_notify
-  } else {
-    $manage_config_file_notify = undef
-  }
-
-  if $version {
-    $manage_package_ensure = $version
-  } else {
-    $manage_package_ensure = $ensure
-  }
-
-  if $ensure == 'absent' {
+  if $package_ensure == 'absent' {
     $config_dir_ensure = absent
     $config_file_ensure = absent
   } else {
@@ -77,11 +54,19 @@ class <%= metadata.name %> (
   }
 
 
+  # Dependency class
+
+  if $<%= metadata.name %>::dependency_class {
+    include $<%= metadata.name %>::dependency_class
+  }
+
+
   # Resources managed
 
   if $<%= metadata.name %>::package_name {
-    package { $<%= metadata.name %>::package_name:
-      ensure   => $<%= metadata.name %>::manage_package_ensure,
+    package { '<%= metadata.name %>':
+      ensure   => $<%= metadata.name %>::package_ensure,
+      name     => $<%= metadata.name %>::package_name,
     }
   }
 
@@ -111,11 +96,11 @@ class <%= metadata.name %> (
   }
 
 
+
   # Extra classes
 
-  if $<%= metadata.name %>::dependency_class {
-    include $<%= metadata.name %>::dependency_class
+  if $<%= metadata.name %>::my_class {
+    include $<%= metadata.name %>::my_class
   }
 
 }
-
