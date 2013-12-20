@@ -35,9 +35,7 @@ class <%= metadata.name %> (
 
   ) inherits <%= metadata.name %>::params {
 
-
   # Class variables validation and management
-
   validate_bool($config_dir_recurse)
   validate_bool($config_dir_purge)
   if $config_file_options_hash { validate_hash($config_file_options_hash) }
@@ -52,16 +50,12 @@ class <%= metadata.name %> (
     $config_file_ensure = present
   }
 
-
   # Dependency class
-
   if $<%= metadata.name %>::dependency_class {
     include $<%= metadata.name %>::dependency_class
   }
 
-
   # Resources managed
-
   if $<%= metadata.name %>::package_name {
     package { '<%= metadata.name %>':
       ensure => $<%= metadata.name %>::package_ensure,
@@ -94,12 +88,8 @@ class <%= metadata.name %> (
     }
   }
 
-
-
   # Extra classes
-
   if $<%= metadata.name %>::my_class {
     include $<%= metadata.name %>::my_class
   }
-
 }
