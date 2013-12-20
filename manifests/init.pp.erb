@@ -38,6 +38,8 @@ class <%= metadata.name %> (
   # Class variables validation and management
   validate_bool($config_dir_recurse)
   validate_bool($config_dir_purge)
+  validate_re($package_ensure, '^(absent|latest|present|purged)$')
+  validate_re($service_ensure, '^(running|stopped)$')
   if $config_file_options_hash { validate_hash($config_file_options_hash) }
 
   $manage_config_file_content = default_content($config_file_content, $config_file_template)
