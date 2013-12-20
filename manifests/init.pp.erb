@@ -43,11 +43,11 @@ class <%= metadata.name %> (
   $manage_config_file_content = default_content($config_file_content, $config_file_template)
 
   if $package_ensure == 'absent' {
-    $config_dir_ensure = absent
-    $config_file_ensure = absent
+    $config_dir_ensure  = 'absent'
+    $config_file_ensure = 'absent'
   } else {
-    $config_dir_ensure = directory
-    $config_file_ensure = present
+    $config_dir_ensure  = 'directory'
+    $config_file_ensure = 'present'
   }
 
   # Dependency class
