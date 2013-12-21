@@ -22,7 +22,6 @@ The module is based on **stdmod** naming standards version 0.9.0.
 
 Refer to http://github.com/stdmod/ for complete documentation on the common parameters.
 
-
 ##Setup
 
 ###Resources managed by <%= metadata.name %> module
@@ -39,68 +38,83 @@ Refer to http://github.com/stdmod/ for complete documentation on the common para
 
 To install the package provided by the module just include it:
 
-        include <%= metadata.name %>
+```puppet
+     include <%= metadata.name %>
+```
 
 The main class arguments can be provided either via Hiera (from Puppet 3.x) or direct parameters:
 
-        class { '<%= metadata.name %>':
-          parameter => value,
-        }
+```puppet
+     class { '<%= metadata.name %>':
+       parameter => value,
+     }
+```
 
 The module provides also a generic define to manage any <%= metadata.name %> configuration file:
 
-        <%= metadata.name %>::conf { 'sample.conf':
-          content => '# Test',
-        }
-
+```puppet
+     <%= metadata.name %>::conf { 'sample.conf':
+       content => '# Test',
+     }
+```
 
 ##Usage
 
 * A common way to use this module involves the management of the main configuration file via a custom template (provided in a custom site module):
 
-        class { '<%= metadata.name %>':
-          config_file_template => 'site/<%= metadata.name %>/<%= metadata.name %>.conf.erb',
-        }
+```puppet
+     class { '<%= metadata.name %>':
+       config_file_template => 'site/<%= metadata.name %>/<%= metadata.name %>.conf.erb',
+     }
+```
 
 * You can write custom templates that use setting provided but the config_file_options_hash paramenter
 
-        class { '<%= metadata.name %>':
-          config_file_template      => 'site/<%= metadata.name %>/<%= metadata.name %>.conf.erb',
-          config_file_options_hash  => {
-            opt  => 'value',
-            opt2 => 'value2',
-          },
-        }
+```puppet
+     class { '<%= metadata.name %>':
+       config_file_template      => 'site/<%= metadata.name %>/<%= metadata.name %>.conf.erb',
+       config_file_options_hash  => {
+         opt  => 'value',
+         opt2 => 'value2',
+       },
+     }
+```
 
 * Use custom source (here an array) for main configuration file. Note that template and source arguments are alternative.
 
-        class { '<%= metadata.name %>':
-          config_file_source => [ "puppet:///modules/site/<%= metadata.name %>/<%= metadata.name %>.conf-${hostname}" ,
-                                  "puppet:///modules/site/<%= metadata.name %>/<%= metadata.name %>.conf" ],
-        }
-
+```puppet
+     class { '<%= metadata.name %>':
+       config_file_source => [ "puppet:///modules/site/<%= metadata.name %>/<%= metadata.name %>.conf-${hostname}" ,
+                               "puppet:///modules/site/<%= metadata.name %>/<%= metadata.name %>.conf" ],
+     }
+```
 
 * Use custom source directory for the whole configuration directory, where present.
 
-        class { '<%= metadata.name %>':
-          config_dir_source  => 'puppet:///modules/site/<%= metadata.name %>/conf/',
-        }
+```puppet
+     class { '<%= metadata.name %>':
+       config_dir_source  => 'puppet:///modules/site/<%= metadata.name %>/conf/',
+     }
+```
 
 * Use custom source directory for the whole configuration directory and purge all the local files that are not on the dir.
   Note: This option can be used to be sure that the content of a directory is exactly the same you expect, but it is desctructive and may remove files.
 
-        class { '<%= metadata.name %>':
-          config_dir_source => 'puppet:///modules/site/<%= metadata.name %>/conf/',
-          config_dir_purge  => true, # Default: false.
-        }
+```puppet
+     class { '<%= metadata.name %>':
+       config_dir_source => 'puppet:///modules/site/<%= metadata.name %>/conf/',
+       config_dir_purge  => true, # Default: false.
+     }
+```
 
 * Use custom source directory for the whole configuration dir and define recursing policy.
 
-        class { '<%= metadata.name %>':
-          config_dir_source    => 'puppet:///modules/site/<%= metadata.name %>/conf/',
-          config_dir_recursion => false, # Default: true.
-        }
-
+```puppet
+     class { '<%= metadata.name %>':
+       config_dir_source    => 'puppet:///modules/site/<%= metadata.name %>/conf/',
+       config_dir_recursion => false, # Default: true.
+     }
+```
 
 ##Operating Systems Support
 
@@ -108,7 +122,6 @@ This is tested on these OS:
 - RedHat osfamily 5 and 6
 - Debian 6 and 7
 - Ubuntu 10.04 and 12.04
-
 
 ##Development
 
