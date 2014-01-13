@@ -30,6 +30,8 @@ class <%= metadata.name %> (
   $config_dir_purge         = false,
   $config_dir_recurse       = true,
 
+  $conf_hash                = undef,
+
   $dependency_class         = undef,
   $my_class                 = undef,
 
@@ -89,7 +91,12 @@ class <%= metadata.name %> (
   }
 
   # Extra classes
+  if $conf_hash {
+    create_resources('<%= metadata.name %>::conf', $conf_hash)
+  }
+
   if $<%= metadata.name %>::my_class {
     include $<%= metadata.name %>::my_class
   }
+
 }
