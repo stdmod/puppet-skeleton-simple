@@ -38,8 +38,13 @@ class <%= metadata.name %> (
   ) inherits <%= metadata.name %>::params {
 
   # Class variables validation and management
+  validate_absolute_path($config_dir_path)
+  validate_absolute_path($config_file_path)
   validate_bool($config_dir_recurse)
   validate_bool($config_dir_purge)
+  validate_string($config_file_owner)
+  validate_string($config_file_group)
+  validate_string($config_file_mode)
   if $config_file_options_hash { validate_hash($config_file_options_hash) }
 
   $manage_config_file_content = default_content($config_file_content, $config_file_template)
